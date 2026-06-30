@@ -604,14 +604,17 @@ function showTrialBanner() {
     font-size: 12px; font-weight: 700; z-index: 9998;
     border-top: 3px solid ${accentColor};
     box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
   `;
   banner.textContent = daysLeft > 0
-    ? `🎁 無料体験 残り${daysLeft}日`
-    : `🔒 無料体験が終了しました`;
+    ? `🎁 無料体験 残り${daysLeft}日（タップで購入）`
+    : `🔒 無料体験が終了しました（タップで購入）`;
+  banner.onclick = function() {
+    showUnlockOverlay(PURCHASE_URL);
+  };
   document.body.appendChild(banner);
   document.body.style.paddingBottom = '50px';
 }
-
 const PURCHASE_URL = 'https://buy.stripe.com/00w28k9Vm6722XO6Ye5wI03';
 </script>
 
