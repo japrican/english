@@ -2278,6 +2278,10 @@ function showVocabResult() {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   initTrialSystem();
+  if (isUnlocked()) {
+    const btn = document.getElementById('early-buy-btn');
+    if (btn) btn.style.display = 'none';
+  }
   showTrialBanner();
   if (!isContentAccessible()) {
     showUnlockOverlay(PURCHASE_URL);
