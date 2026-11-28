@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<script>/* 音声の速さ（ゆっくり／ふつう）。小・中の英語アプリで共通の設定 */
+const SPD_K='audio_speed_v1';function spdSlow(){try{return localStorage.getItem(SPD_K)!=='normal'}catch(e){return true}}
+function spdA(a){try{const r=spdSlow()?0.8:1;a.defaultPlaybackRate=r;a.playbackRate=r;a.preservesPitch=true;a.mozPreservesPitch=true;a.webkitPreservesPitch=true}catch(e){}}
+function spdT(){return spdSlow()?0.7:0.9}
+function spdLabel(){return spdSlow()?'🐢 ゆっくり':'🐇 ふつう'}
+function toggleSpd(){try{localStorage.setItem(SPD_K,spdSlow()?'normal':'slow')}catch(e){}document.querySelectorAll('.spdbtn').forEach(b=>{b.textContent=spdLabel();b.setAttribute('aria-label','音声の速さ：'+(spdSlow()?'ゆっくり':'ふつう'))})}
+document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('.spdbtn').forEach(b=>b.textContent=spdLabel()));</script>
 <script>/* 同じ学年の単品を4教科以上買った人は、セット扱いにする（4教科分＝3,920円でセット3,500円より高いため） */
 (function(){try{var L=localStorage,n=function(ks,v){return ks.filter(function(k){return L.getItem('app_unlocked_'+k)===v}).length};
 if(!L.getItem('bundle_sho_unlocked_v1')&&n(['sansu','kokugo-sho','kanji','rika-sho','shakai-sho','eigo'],'1')>=4){L.setItem('bundle_sho_unlocked_v1','1');window.__autoSet='sho'}
@@ -302,7 +309,7 @@ body:not(.home) .hint,body:not(.home) .trial{display:none}
  <section class="scr" id="sPoint">
   <div class="xbar"><button class="xbtn" onclick="go('sHome')" aria-label="とじる"><span data-ic="x"></span></button><div class="pbar"><i style="width:8%"></i></div></div>
   <div class="lh"><small id="pTag"></small><h2 id="pTitle"></h2><p id="pSub"></p></div>
-  <div class="card" id="chatCard"><h3><span data-ic="chat"></span>会話<button class="playall" onclick="playAll()"><span data-ic="play"></span>通して聞く</button></h3><div class="chat" id="chatList"></div></div>
+  <div class="card" id="chatCard"><h3><span data-ic="chat"></span>会話<button class="playall" onclick="playAll()"><span data-ic="play"></span>通して聞く</button><button class="playall spdbtn" onclick="toggleSpd()" style="margin-left:6px" aria-label="音声の速さ">🐢 ゆっくり</button></h3><div class="chat" id="chatList"></div></div>
   <div class="card"><h3><span data-ic="bulb"></span>ポイント</h3><div id="pFig"></div><ul class="pts" id="pList"></ul></div>
   <div class="card" id="senCard"><h3><span data-ic="chat"></span><span id="senTitle">例文</span></h3><ul class="sen" id="senList"></ul></div>
   <div class="card ckcard" id="ckCard"><h3><span data-ic="clip"></span>ここだけはチェック</h3><ul class="ckl" id="ckUnit"></ul></div>
@@ -1552,12 +1559,12 @@ let _au=null;
 function stopSay(){try{if(_au){_au.pause();_au=null}speechSynthesis&&speechSynthesis.cancel()}catch(e){}}
 function say(t){try{if(_au){_au.pause();_au=null}speechSynthesis&&speechSynthesis.cancel()}catch(e){}
  const id=AUDIO[t];let fell=false;const fb=()=>{if(fell)return;fell=true;tts(t)};
- if(id){_au=new Audio(id+'.mp3');_au.onerror=fb;_au.play().catch(fb)}else tts(t)}
+ if(id){_au=new Audio(id+'.mp3');spdA(_au);_au.onerror=fb;_au.play().catch(fb)}else tts(t)}
 function playAll(){const L=(U&&U.chat)||[];let k=0;
  (function next(){if(k>=L.length)return;const t=L[k++][1],id=AUDIO[t];
-  if(id){_au=new Audio(id+'.mp3');_au.onended=()=>setTimeout(next,350);_au.onerror=()=>{tts(t);setTimeout(next,2500)};_au.play().catch(()=>{tts(t);setTimeout(next,2500)})}
+  if(id){_au=new Audio(id+'.mp3');spdA(_au);_au.onended=()=>setTimeout(next,350);_au.onerror=()=>{tts(t);setTimeout(next,2500)};_au.play().catch(()=>{tts(t);setTimeout(next,2500)})}
   else{tts(t);setTimeout(next,Math.max(1800,t.length*80))}})()}
-function tts(t){if(!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.92;
+function tts(t){if(!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=spdT();
  const vs=speechSynthesis.getVoices().filter(v=>/^en[-_]US/i.test(v.lang));
  const v=vs.find(v=>/Samantha|Ava|Allison|Google US English|Jenny|Aria/i.test(v.name))||vs[0];if(v)u.voice=v;speechSynthesis.speak(u)}
 /* ===================== 保存 ===================== */
